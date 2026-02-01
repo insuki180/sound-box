@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>Sound Box – Voice Submission</title>
+
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #f5f6f8;
+  margin: 0;
+  color: #333;
+}
+.container {
+  max-width: 480px;
+  margin: auto;
+  background: #fff;
+  min-height: 100vh;
+  padding: 24px 20px;
+}
+.header { text-align: center; margin-bottom: 20px; }
+.client-name { font-size: 22px; font-weight: 800; }
+.powered { font-size: 12px; color: #888; }
+
+.trust-box {
+  background: #f0f4f8;
+  padding: 12px;
+  border-left: 4px solid #ccdbe8;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.label-text { font-size: 14px; font-weight: 600; margin-bottom: 6px; display: block; }
+
+.type-buttons { display: flex; gap: 10px; margin-bottom: 15px; }
+.type-buttons button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 600;
+}
+button.complaint.active { background:#ffebeb; border-color:#d9534f; color:#d9534f; }
+button.suggestion.active { background:#eef7fe; border-color:#0275d8; color:#0275d8; }
+button.feedback.active { background:#f0f9f0; border-color:#5cb85c; color:#5cb85c; }
+
+textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 14px;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+  font-size: 16px;
+}
+textarea:disabled { background:#f9f9f9; }
+
+.identity-section { border-top:1px solid #eee; padding-top:15px; margin-top:20px; }
+.identity-toggle { display:flex; justify-content:space-between; cursor:pointer; font-weight:600; }
+.identity-fields { display:none; margin-top:10px; }
+.identity-fields input {
+  width:100%;
+  padding:12px;
+  margin-bottom:8px;
+  border-radius:6px;
+  border:1px solid #ddd;
+}
+
+.submit-btn {
+  width:100%;
+  padding:16px;
+  background:#222;
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+}
+.submit-btn.loading { background:#888; cursor:wait; }
+
+.success-screen {
+  display:none;
+  text-align:center;
+  padding-top:80px;
+}
+.success-screen h1 { font-size:26px; }
+.success-screen a { color:#0275d8; cursor:pointer; }
+
+.shake { animation: shake 0.4s; }
+@keyframes shake {
+  10%,90%{transform:translateX(-1px);}
+  20%,80%{transform:translateX(2px);}
+  30%,50%,70%{transform:translateX(-4px);}
+  40%,60%{transform:translateX(4px);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div id="formArea">
+    <div class="header">
+      <div class="client-name">Green Valley Apartments</div>
+      <div class="powered">Powered by <b>Sound Box</b> · A product by Scan2Print</div>
+    </div>
+
+    <div class="trust-box">
+      🔒 Maintained by a third party. Anonymous by default.
+    </div>
+
+    <span class="label-text">1. What is this regarding?</span>
+    <div class="type-buttons">
+      <button class="complaint" onclick="selectType('complaint')">😡 Complaint</button>
+      <button class="suggestion" onclick="selectType('suggestion')">💡 Suggestion</button>
+      <button class="feedback" onclick="selectType('feedback')">💬 Feedback</button>
+    </div>
+
+    <span class="label-text">2. Your Message</span>
+    <textarea id="messageBox" placeholder="Select a category above…" disabled></textarea>
+
+    <div class="identity-section">
+      <div class="identity-toggle" onclick="toggleIdentity()">
+        <span>Want us to contact you? (optional)</span><span>▼</span>
+      </div>
+      <div class="identity-fields" id="identityFields">
+        <input id="userName" placeholder="Your name (optional)">
+        <input id="userContact" placeholder="Phone or Email (optional)">
+        <div style="font-size:12px;color:#888;">Leaving this blank keeps you anonymous.</div>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="submitForm()">Submit</button>
+  </div>
+
+  <div class="success-screen" id="successArea">
+    <h1>Your voice has been heard.</h1>
+    <p>Your submission was recorded securely.</p>
+    <a onclick="location.reload()">Submit another response</a>
+  </div>
+
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbxioctpkczILIhVgO9t6DgE7hkA9ffAUBo2ZR9qqmgoFHWZuI1uUjlx-_zUxp0H0YEw/exec";
+let selectedType = null;
+
+function selectType(type){
+  selectedType = type;
+  document.querySelectorAll('.type-buttons button').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.'+type).classList.add('active');
+  const t = document.getElementById('messageBox');
+  t.disabled = false;
+  t.focus();
+  t.placeholder =
+    type==='complaint' ? 'What went wrong?' :
+    type==='suggestion' ? 'How can we improve?' :
+    'Share your thoughts…';
+}
+
+function toggleIdentity(){
+  const el = document.getElementById('identityFields');
+  el.style.display = el.style.display === 'block' ? 'none' : 'block';
+}
+
+function submitForm(){
+  const msg = document.getElementById('messageBox');
+  const btn = document.getElementById('submitBtn');
+
+  if(!selectedType){
+    alert("Please select Complaint, Suggestion, or Feedback");
+    return;
+  }
+  if(msg.value.trim()===""){
+    msg.classList.add('shake');
+    setTimeout(()=>msg.classList.remove('shake'),500);
+    return;
+  }
+
+  const payload = {
+    action: "submit",
+    type: selectedType.charAt(0).toUpperCase()+selectedType.slice(1),
+    message: msg.value.trim(),
+    is_anonymous: true,
+    name: "",
+    contact: ""
+  };
+
+  const name = document.getElementById('userName').value.trim();
+  const contact = document.getElementById('userContact').value.trim();
+  if(name || contact){
+    payload.is_anonymous = false;
+    payload.name = name;
+    payload.contact = contact;
+  }
+
+  btn.classList.add('loading');
+  btn.innerText = "Securing your voice…";
+  btn.disabled = true;
+
+  fetch(API_URL,{
+    method:"POST",
+    mode:"no-cors",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify(payload)
+  }).then(()=>{
+    document.getElementById('formArea').style.display='none';
+    document.getElementById('successArea').style.display='block';
+  }).catch(()=>{
+    alert("Network error. Please try again.");
+    btn.disabled=false;
+    btn.classList.remove('loading');
+    btn.innerText="Submit";
+  });
+}
+</script>
+
+</body>
+</html>
