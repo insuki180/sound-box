@@ -6,111 +6,71 @@
 <title>Sound Box – Voice Submission</title>
 
 <style>
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background: #f5f6f8;
-  margin: 0;
-  color: #333;
-}
-.container {
-  max-width: 480px;
-  margin: auto;
-  background: #fff;
-  min-height: 100vh;
-  padding: 24px 20px;
-}
-.header { text-align: center; margin-bottom: 20px; }
-.client-name { font-size: 22px; font-weight: 800; }
-.powered { font-size: 12px; color: #888; }
+  /* ---------- BASE STYLES ---------- */
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f5f6f8; color: #333; margin: 0; padding: 0; }
+  .container { max-width: 480px; margin: auto; background: #ffffff; min-height: 100vh; padding: 24px 20px; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
+  
+  /* HEADER */
+  .header { text-align: center; margin-bottom: 20px; }
+  .client-name { font-size: 22px; font-weight: 800; color: #111; margin-bottom: 4px; }
+  .powered { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
 
-.trust-box {
-  background: #f0f4f8;
-  padding: 12px;
-  border-left: 4px solid #ccdbe8;
-  font-size: 13px;
-  margin-bottom: 20px;
-}
+  /* TRUST BOX */
+  .trust-box { background: #f0f4f8; padding: 12px; font-size: 13px; border-radius: 8px; color: #445566; margin-bottom: 24px; border-left: 4px solid #ccdbe8; line-height: 1.4; }
 
-.label-text { font-size: 14px; font-weight: 600; margin-bottom: 6px; display: block; }
+  /* BUTTONS */
+  .label-text { font-size: 14px; font-weight: 600; margin-bottom: 8px; display: block; color: #444; }
+  .type-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
+  .type-buttons button { flex: 1; padding: 12px 5px; border-radius: 8px; border: 1px solid #e0e0e0; background: #fff; cursor: pointer; font-size: 14px; font-weight: 500; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: all 0.2s ease; }
+  button.complaint.active { background: #ffebeb; border-color: #d9534f; color: #d9534f; }
+  button.suggestion.active { background: #eef7fe; border-color: #0275d8; color: #0275d8; }
+  button.feedback.active { background: #f0f9f0; border-color: #5cb85c; color: #5cb85c; }
 
-.type-buttons { display: flex; gap: 10px; margin-bottom: 15px; }
-.type-buttons button {
-  flex: 1;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background: #fff;
-  cursor: pointer;
-  font-weight: 600;
-}
-button.complaint.active { background:#ffebeb; border-color:#d9534f; color:#d9534f; }
-button.suggestion.active { background:#eef7fe; border-color:#0275d8; color:#0275d8; }
-button.feedback.active { background:#f0f9f0; border-color:#5cb85c; color:#5cb85c; }
+  /* INPUTS */
+  textarea { width: 100%; min-height: 140px; padding: 16px; border-radius: 8px; border: 2px solid #e0e0e0; resize: none; font-size: 16px; font-family: inherit; box-sizing: border-box; }
+  textarea:focus { outline: none; }
+  textarea:disabled { background: #f9f9f9; cursor: not-allowed; }
+  textarea.complaint { border-color: #d9534f; }
+  textarea.suggestion { border-color: #0275d8; }
+  textarea.feedback { border-color: #5cb85c; }
 
-textarea {
-  width: 100%;
-  min-height: 140px;
-  padding: 14px;
-  border-radius: 8px;
-  border: 2px solid #ddd;
-  font-size: 16px;
-}
-textarea:disabled { background:#f9f9f9; }
+  /* FILE UPLOAD & IDENTITY */
+  .file-upload-wrapper { margin: 24px 0; border: 1px dashed #ccc; border-radius: 8px; padding: 15px; text-align: center; background: #fafafa; }
+  .custom-file-upload { font-size: 14px; font-weight: 600; color: #0275d8; cursor: pointer; }
+  input[type="file"] { display: none; }
+  .privacy-note { font-size: 11px; color: #d9534f; margin-top: 8px; }
+  
+  .identity-section { border-top: 1px solid #eee; padding-top: 20px; margin-bottom: 20px; }
+  .identity-toggle { cursor: pointer; font-size: 14px; font-weight: 500; display: flex; justify-content: space-between; }
+  .identity-fields { display: none; margin-top: 12px; }
+  .identity-fields input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
 
-.identity-section { border-top:1px solid #eee; padding-top:15px; margin-top:20px; }
-.identity-toggle { display:flex; justify-content:space-between; cursor:pointer; font-weight:600; }
-.identity-fields { display:none; margin-top:10px; }
-.identity-fields input {
-  width:100%;
-  padding:12px;
-  margin-bottom:8px;
-  border-radius:6px;
-  border:1px solid #ddd;
-}
+  /* ACTIONS */
+  .submit-btn { width: 100%; padding: 16px; background: #222; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; }
+  .submit-btn.loading { background: #888; cursor: wait; }
+  .shake { animation: shake 0.4s; }
+  @keyframes shake { 10%, 90% { transform: translateX(-1px); } 20%, 80% { transform: translateX(2px); } 30%, 50%, 70% { transform: translateX(-4px); } 40%, 60% { transform: translateX(4px); } }
 
-.submit-btn {
-  width:100%;
-  padding:16px;
-  background:#222;
-  color:#fff;
-  border:none;
-  border-radius:8px;
-  font-size:16px;
-  font-weight:700;
-  cursor:pointer;
-}
-.submit-btn.loading { background:#888; cursor:wait; }
-
-.success-screen {
-  display:none;
-  text-align:center;
-  padding-top:80px;
-}
-.success-screen h1 { font-size:26px; }
-.success-screen a { color:#0275d8; cursor:pointer; }
-
-.shake { animation: shake 0.4s; }
-@keyframes shake {
-  10%,90%{transform:translateX(-1px);}
-  20%,80%{transform:translateX(2px);}
-  30%,50%,70%{transform:translateX(-4px);}
-  40%,60%{transform:translateX(4px);}
-}
+  /* SUCCESS SCREEN */
+  .success-screen { display: none; text-align: center; padding-top: 80px; }
+  .success-icon { font-size: 48px; margin-bottom: 16px; }
+  .success-screen h1 { font-size: 26px; margin-bottom: 8px; }
+  .success-screen p { color: #666; font-size: 15px; }
+  .success-screen a { color: #0275d8; text-decoration: underline; cursor: pointer; display: block; margin-top: 20px; }
 </style>
 </head>
-
 <body>
 
 <div class="container">
 
   <div id="formArea">
     <div class="header">
-      <div class="client-name">Green Valley Apartments</div>
+      <div class="client-name" id="displayClientName">Loading...</div>
       <div class="powered">Powered by <b>Sound Box</b> · A product by Scan2Print</div>
     </div>
 
     <div class="trust-box">
-      🔒 Maintained by a third party. Anonymous by default.
+      🔒 Maintained by a third-party service. Submissions are anonymous by default.
     </div>
 
     <span class="label-text">1. What is this regarding?</span>
@@ -121,16 +81,22 @@ textarea:disabled { background:#f9f9f9; }
     </div>
 
     <span class="label-text">2. Your Message</span>
-    <textarea id="messageBox" placeholder="Select a category above…" disabled></textarea>
+    <textarea id="messageBox" placeholder="Select a category above to begin..." disabled></textarea>
+
+    <div class="file-upload-wrapper">
+      <label class="custom-file-upload">📷 Upload photos (optional)</label>
+      <div class="privacy-note">⚠️ Ensure photos do not reveal your identity.</div>
+    </div>
 
     <div class="identity-section">
       <div class="identity-toggle" onclick="toggleIdentity()">
-        <span>Want us to contact you? (optional)</span><span>▼</span>
+        <span>Want us to contact you? (optional)</span>
+        <span>▼</span>
       </div>
       <div class="identity-fields" id="identityFields">
-        <input id="userName" placeholder="Your name (optional)">
-        <input id="userContact" placeholder="Phone or Email (optional)">
-        <div style="font-size:12px;color:#888;">Leaving this blank keeps you anonymous.</div>
+        <input type="text" id="userName" placeholder="Your name (optional)">
+        <input type="text" id="userContact" placeholder="Phone or Email (optional)">
+        <div style="font-size:12px;color:#888;">Leaving this blank keeps your submission anonymous.</div>
       </div>
     </div>
 
@@ -138,53 +104,93 @@ textarea:disabled { background:#f9f9f9; }
   </div>
 
   <div class="success-screen" id="successArea">
+    <div class="success-icon">✅</div>
     <h1>Your voice has been heard.</h1>
-    <p>Your submission was recorded securely.</p>
+    <p>Your submission has been recorded securely.</p>
     <a onclick="location.reload()">Submit another response</a>
   </div>
 
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxioctpkczILIhVgO9t6DgE7hkA9ffAUBo2ZR9qqmgoFHWZuI1uUjlx-_zUxp0H0YEw/exec";
-let selectedType = null;
+// --- 1. CLIENT CONFIGURATION (EDIT THIS TO ADD CLIENTS) ---
+const CLIENT_CONFIG = {
+  // Key must match ?client=KEY in QR code
+  "greenvalley": {
+    name: "Green Valley Apartments",
+    url: "https://script.google.com/macros/s/AKfycbxioctpkczILIhVgO9t6DgE7hkA9ffAUBo2ZR9qqmgoFHWZuI1uUjlx-_zUxp0H0YEw/exec" // <--- Paste Green Valley Script URL
+  },
+  
+  // Example for next client:
+  /*
+  "fitzone": {
+    name: "FitZone Gym",
+    url: "https://script.google.com/macros/s/..../exec"
+  }
+  */
+};
 
-function selectType(type){
-  selectedType = type;
-  document.querySelectorAll('.type-buttons button').forEach(b=>b.classList.remove('active'));
-  document.querySelector('.'+type).classList.add('active');
-  const t = document.getElementById('messageBox');
-  t.disabled = false;
-  t.focus();
-  t.placeholder =
-    type==='complaint' ? 'What went wrong?' :
-    type==='suggestion' ? 'How can we improve?' :
-    'Share your thoughts…';
+// --- 2. CLIENT ROUTING LOGIC ---
+const params = new URLSearchParams(window.location.search);
+const clientId = params.get("client");
+const clientData = CLIENT_CONFIG[clientId];
+
+// Validation: If client is missing or invalid, block the page
+if (!clientId || !clientData) {
+  document.body.innerHTML = `
+    <div style="max-width:480px; margin:80px auto; text-align:center; font-family:sans-serif; padding:20px;">
+      <h2 style="color:#d9534f;">Invalid QR Code</h2>
+      <p style="color:#666;">This feedback link is not configured correctly or the client ID is missing.</p>
+      <p style="font-size:12px; color:#999; margin-top:20px;">Error: Unknown Client ID</p>
+    </div>
+  `;
+  throw new Error("Invalid Client ID");
 }
 
-function toggleIdentity(){
+// Apply Client Name to Header
+document.getElementById("displayClientName").innerText = clientData.name;
+const API_URL = clientData.url;
+
+
+// --- 3. FORM LOGIC ---
+let selectedType = null;
+
+function selectType(type) {
+  selectedType = type;
+  document.querySelectorAll('.type-buttons button').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.${type}`).classList.add('active');
+
+  const textarea = document.getElementById('messageBox');
+  textarea.disabled = false;
+  textarea.className = type;
+  textarea.focus();
+
+  if (type === 'complaint') textarea.placeholder = "What went wrong? Be as specific as you like...";
+  if (type === 'suggestion') textarea.placeholder = "How can we make things better?";
+  if (type === 'feedback') textarea.placeholder = "Share your thoughts with us...";
+}
+
+function toggleIdentity() {
   const el = document.getElementById('identityFields');
   el.style.display = el.style.display === 'block' ? 'none' : 'block';
 }
 
-function submitForm(){
-  const msg = document.getElementById('messageBox');
+function submitForm() {
+  const textarea = document.getElementById('messageBox');
   const btn = document.getElementById('submitBtn');
 
-  if(!selectedType){
-    alert("Please select Complaint, Suggestion, or Feedback");
-    return;
-  }
-  if(msg.value.trim()===""){
-    msg.classList.add('shake');
-    setTimeout(()=>msg.classList.remove('shake'),500);
+  if (!selectedType) { alert("Please select a category."); return; }
+  if (textarea.value.trim() === "") {
+    textarea.classList.add('shake');
+    setTimeout(() => textarea.classList.remove('shake'), 500);
     return;
   }
 
+  // Payload
   const payload = {
     action: "submit",
-    type: selectedType.charAt(0).toUpperCase()+selectedType.slice(1),
-    message: msg.value.trim(),
+    type: selectedType.charAt(0).toUpperCase() + selectedType.slice(1),
+    message: textarea.value.trim(),
     is_anonymous: true,
     name: "",
     contact: ""
@@ -192,33 +198,38 @@ function submitForm(){
 
   const name = document.getElementById('userName').value.trim();
   const contact = document.getElementById('userContact').value.trim();
-  if(name || contact){
+
+  if (name || contact) {
     payload.is_anonymous = false;
     payload.name = name;
     payload.contact = contact;
   }
 
+  // UI Loading
   btn.classList.add('loading');
-  btn.innerText = "Securing your voice…";
+  btn.innerText = "Securing your voice...";
   btn.disabled = true;
 
-  fetch(API_URL,{
-    method:"POST",
-    mode:"no-cors",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify(payload)
-  }).then(()=>{
-    document.getElementById('formArea').style.display='none';
-    document.getElementById('successArea').style.display='block';
-  }).catch(()=>{
-    alert("Network error. Please try again.");
-    btn.disabled=false;
+  // Send to the SPECIFIC Client URL
+  fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(() => {
+    document.getElementById('formArea').style.display = 'none';
+    document.getElementById('successArea').style.display = 'block';
+    window.scrollTo(0, 0);
+  })
+  .catch(err => {
+    alert("Network error. Please check connection.");
     btn.classList.remove('loading');
-    btn.innerText="Submit";
+    btn.innerText = "Submit";
+    btn.disabled = false;
   });
 }
 </script>
 
 </body>
 </html>
-
