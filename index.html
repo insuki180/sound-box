@@ -6,40 +6,50 @@
 <title>OpenVoice – Voice Submission</title>
 
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background:#f5f6f8; margin:0; }
-  .container { max-width:480px; margin:auto; background:#fff; min-height:100vh; padding:24px 20px; box-shadow:0 0 20px rgba(0,0,0,0.05); }
+  /* --- BASE STYLES --- */
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f5f6f8; color: #333; margin: 0; padding: 0; }
+  .container { max-width: 480px; margin: auto; background: #ffffff; min-height: 100vh; padding: 24px 20px; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
+  
+  /* ELEMENTS */
+  .header { text-align: center; margin-bottom: 20px; }
+  
+  /* Pixelated Logo Style */
+  .logo-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 8px; }
+  .pixel-logo { width: 32px; height: 32px; image-rendering: pixelated; }
 
-  .header { text-align:center; margin-bottom:20px; }
-  .logo { display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom:6px; }
-  .logo svg { width:28px; height:28px; }
-  .client-name { font-size:22px; font-weight:800; color:#111; }
-  .powered { font-size:12px; color:#888; text-transform:uppercase; }
-
-  .trust-box { background:#f0f4f8; padding:12px; font-size:13px; border-radius:8px; color:#445566; margin-bottom:24px; border-left:4px solid #ccdbe8; }
-
-  .type-buttons { display:flex; gap:10px; margin-bottom:20px; }
-  .type-buttons button { flex:1; padding:12px; border-radius:8px; border:1px solid #e0e0e0; background:#fff; cursor:pointer; font-weight:500; }
-  button.active { background:#eee; border-color:#333; }
-
-  textarea { width:100%; min-height:140px; padding:16px; border-radius:8px; border:2px solid #e0e0e0; resize:none; font-size:16px; }
-  textarea:disabled { background:#f9f9f9; }
-
-  .identity-section { border-top:1px solid #eee; padding-top:20px; margin-bottom:20px; }
-  .identity-fields { display:none; margin-top:12px; }
-  .identity-fields input { width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:6px; }
-
-  .submit-btn { width:100%; padding:16px; background:#222; color:#fff; border:none; border-radius:8px; font-size:16px; font-weight:700; cursor:pointer; }
-
-  .hidden { display:none; }
+  .client-name { font-size: 22px; font-weight: 800; color: #111; margin-bottom: 4px; }
+  .powered { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+  .trust-box { background: #f0f4f8; padding: 12px; font-size: 13px; border-radius: 8px; color: #445566; margin-bottom: 24px; border-left: 4px solid #ccdbe8; line-height: 1.4; }
+  
+  .type-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
+  .type-buttons button { flex: 1; padding: 12px 5px; border-radius: 8px; border: 1px solid #e0e0e0; background: #fff; cursor: pointer; font-size: 14px; font-weight: 500; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  button.active { background: #eee; border-color: #333; }
+  
+  textarea { width: 100%; min-height: 140px; padding: 16px; border-radius: 8px; border: 2px solid #e0e0e0; resize: none; font-size: 16px; font-family: inherit; box-sizing: border-box; }
+  textarea:disabled { background: #f9f9f9; }
+  
+  .identity-section { border-top: 1px solid #eee; padding-top: 20px; margin-bottom: 20px; }
+  .identity-fields { display: none; margin-top: 12px; }
+  .identity-fields input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+  
+  .submit-btn { width: 100%; padding: 16px; background: #222; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; }
+  
+  /* STATES */
+  .error-state { text-align: center; padding: 60px 20px; }
+  .error-state h2 { color: #d9534f; }
+  .hidden { display: none; }
 </style>
 </head>
-
 <body>
+
 <div class="container" id="app">
-  <div style="text-align:center; padding-top:100px; color:#888;">Loading OpenVoice…</div>
+  <div style="text-align:center; padding-top:100px; color:#888;">
+    Loading OpenVoice...
+  </div>
 </div>
 
 <script>
+// --- 1. CONFIGURATION ---
 const CLIENT_CONFIG = {
   "greenvalley": {
     name: "Green Valley Apartments",
@@ -51,33 +61,41 @@ const CLIENT_CONFIG = {
   }
 };
 
+// --- 2. ROUTER & RENDERER ---
 const params = new URLSearchParams(window.location.search);
 const clientId = params.get("client");
 const app = document.getElementById("app");
 
+// VALIDATION: Block invalid clients immediately
 if (!clientId || !CLIENT_CONFIG[clientId]) {
-  app.innerHTML = `<h3 style="color:red;text-align:center;">Invalid QR Code</h3>`;
+  app.innerHTML = `
+    <div class="error-state">
+      <h2>Invalid QR Code</h2>
+      <p>This feedback link is not configured correctly.</p>
+      <p style="font-size:12px; color:#999; margin-top:20px;">Missing or Unknown Client ID</p>
+    </div>
+  `;
   throw new Error("Invalid Client");
 }
 
+// SETUP VALID CLIENT
 const CLIENT = CLIENT_CONFIG[clientId];
 const API_URL = CLIENT.url;
 
+// INJECT UI
 app.innerHTML = `
   <div id="formArea">
     <div class="header">
-      <div class="logo">
-        <!-- OpenVoice Logo -->
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M4 10v4a6 6 0 006 6h4a6 6 0 006-6v-4" stroke="#2F80ED" stroke-width="2"/>
-          <path d="M12 3v11" stroke="#2F80ED" stroke-width="2"/>
+      <div class="logo-container">
+        <svg class="pixel-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M9 2H15V4H17V12H15V14H9V12H7V4H9V2ZM9 4H15V12H9V4ZM5 11H7V12H17V11H19V12H17V15H15V17H13V20H17V22H7V20H11V17H9V15H7V12H5V11Z" fill="#111"/>
         </svg>
-        <div class="client-name">${CLIENT.name}</div>
       </div>
+      <div class="client-name">${CLIENT.name}</div>
       <div class="powered">Powered by <b>OpenVoice</b></div>
     </div>
 
-    <div class="trust-box">🔒 Anonymous by default · Maintained by a neutral third party</div>
+    <div class="trust-box">🔒 Anonymous by default. Maintained by 3rd Party.</div>
 
     <div class="type-buttons">
       <button onclick="selectType('Complaint', this)">😡 Complaint</button>
@@ -85,76 +103,94 @@ app.innerHTML = `
       <button onclick="selectType('Feedback', this)">💬 Feedback</button>
     </div>
 
-    <textarea id="messageBox" placeholder="Select a category above…" disabled></textarea>
+    <textarea id="messageBox" placeholder="Select a category above..." disabled></textarea>
 
     <div class="identity-section">
-      <div onclick="toggleIdentity()" style="cursor:pointer;font-weight:500;">Want a reply? (Optional) ▼</div>
+      <div onclick="toggleIdentity()" style="cursor:pointer; font-weight:500;">
+        Want a reply? (Optional) ▼
+      </div>
       <div class="identity-fields" id="identityFields">
-        <input id="userName" placeholder="Your name">
-        <input id="userContact" placeholder="Phone or Email">
+        <input type="text" id="userName" placeholder="Your Name">
+        <input type="text" id="userContact" placeholder="Phone or Email">
       </div>
     </div>
 
     <button class="submit-btn" id="submitBtn" onclick="submitForm()">Submit</button>
   </div>
 
-  <div id="successArea" class="hidden" style="text-align:center;padding-top:60px;">
-    <div style="font-size:48px;">✅</div>
+  <div id="successArea" class="hidden" style="text-align:center; padding-top:60px;">
+    <div style="font-size:48px; margin-bottom:20px;">✅</div>
     <h2>Your voice has been heard.</h2>
-    <p>Your submission was sent securely.</p>
-  </div>
-`;
+    <p>Your submission has been sent securely.</p>
+  </div>`;
 
+// --- 3. LOGIC ---
 let selectedType = null;
 
 function selectType(type, btn) {
   selectedType = type;
-  document.querySelectorAll("button").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
-  const t = document.getElementById("messageBox");
-  t.disabled = false;
-  t.focus();
+  // Reset buttons
+  document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  const txt = document.getElementById('messageBox');
+  txt.disabled = false;
+  txt.focus();
+  
+  // --- RESTORED LOGIC ---
+  if(type === 'Complaint') txt.placeholder = "What went wrong? Please be specific.";
+  if(type === 'Suggestion') txt.placeholder = "How can we improve?";
+  if(type === 'Feedback') txt.placeholder = "Share your thoughts...";
 }
 
 function toggleIdentity() {
-  const el = document.getElementById("identityFields");
-  el.style.display = el.style.display === "block" ? "none" : "block";
+  const el = document.getElementById('identityFields');
+  el.style.display = el.style.display === 'block' ? 'none' : 'block';
 }
 
 function submitForm() {
-  const txt = document.getElementById("messageBox");
-  if (!selectedType || !txt.value.trim()) return alert("Complete the form");
+  const txt = document.getElementById('messageBox');
+  if (!selectedType) { alert("Please select a category."); return; }
+  if (!txt.value.trim()) { alert("Please write a message."); return; }
 
   const payload = {
-    action:"submit",
-    type:selectedType,
-    message:txt.value.trim(),
-    is_anonymous:true,
-    name:"",
-    contact:""
+    action: "submit",
+    type: selectedType,
+    message: txt.value.trim(),
+    is_anonymous: true,
+    name: "",
+    contact: ""
   };
 
-  const name = userName.value.trim();
-  const contact = userContact.value.trim();
+  const name = document.getElementById('userName').value.trim();
+  const contact = document.getElementById('userContact').value.trim();
+
   if (name || contact) {
     payload.is_anonymous = false;
     payload.name = name;
     payload.contact = contact;
   }
 
-  submitBtn.innerText = "Sending…";
-  submitBtn.disabled = true;
+  // Visual Loading
+  const btn = document.getElementById('submitBtn');
+  btn.innerText = "Sending...";
+  btn.disabled = true;
 
   fetch(API_URL, {
-    method:"POST",
-    mode:"no-cors",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify(payload)
-  }).then(()=>{
-    formArea.classList.add("hidden");
-    successArea.classList.remove("hidden");
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    document.getElementById('formArea').classList.add('hidden');
+    document.getElementById('successArea').classList.remove('hidden');
+  }).catch(() => {
+    alert("Network Error");
+    btn.innerText = "Submit";
+    btn.disabled = false;
   });
 }
 </script>
+
 </body>
 </html>
